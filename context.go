@@ -79,22 +79,11 @@ func (c *context) bootstrap() {
 		// if the handler returned something, write it to the http response
 		if len(vals) > 0 {
 			ev := c.Get(reflect.TypeOf(ReturnHandler(nil)))
-			// fmt.Println("context ..bootstrap:", len(vals), "=====", vals[0])
-			// fmt.Println("context ..bootstrap:", reflect.TypeOf(ReturnHandler(nil)))
 			handleReturn := ev.Interface().(ReturnHandler)
-			// fmt.Println("return:  ",
-			// 	c.index,
-			// 	"==v==",
-			// 	c,
-			// 	"====",
-			// 	vals,
-			// 	"==========",
-			// 	reflect.TypeOf(handleReturn))
 			handleReturn(c, vals)
 		}
 
 		if c.rw.IsWrite() {
-			// fmt.Println("IsWrite")
 			return
 		}
 

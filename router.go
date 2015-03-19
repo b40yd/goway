@@ -153,7 +153,7 @@ func (routes *Routes) Handler(w http.ResponseWriter, r *http.Request, c Context)
 			c.Map(vals)
 			break
 		} else {
-			routes.handlers = make([]Handler, 0)
+			routes.handlers = []Handler{http.NotFound} //make([]Handler, 0)
 		}
 	}
 	//

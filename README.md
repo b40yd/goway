@@ -2,9 +2,9 @@
 
 ## Goway:
 
-    *Martini* is a powerful package for quickly writing modular web applications/services in Golang.
+*Martini* is a powerful package for quickly writing modular web applications/services in Golang.
 
-    *Goway* it's an web framework,The *martini* framework code to do some optimization.
+*Goway* it's an web framework,The *martini* framework code to do some optimization.
 
 
 ## Usage
@@ -28,7 +28,7 @@
 
 ```
 ## Routing
-    In Goway, a route is an HTTP method paired with a URL-matching pattern. Each route can take one or more handler methods:
+In Goway, a route is an HTTP method paired with a URL-matching pattern. Each route can take one or more handler methods:
 
 ```go
     m.Get("/", func() {
@@ -65,11 +65,11 @@
     [example/test.go](example/test.go)
 
 ## About Goway
-    Inspired by *Express*(Nodejs) and *Sinatra*(Ruby) and *Martini*(Go) and *Symfony*(PHP).
-    This framework is simple enough, and the use of modular programming, this is a way I like it very much.
-    Subsequent functional may not continue like as *Martini*,*Goway* will learn other good characteristics of the web framework.
+Inspired by *Express*(Nodejs) and *Sinatra*(Ruby) and *Martini*(Go) and *Symfony*(PHP).
+This framework is simple enough, and the use of modular programming, this is a way I like it very much.
+Subsequent functional may not continue like as *Martini*,*Goway* will learn other good characteristics of the web framework.
 
 
 ## License
-    Go Way is released under the GPLV3 license:
+Go Way is released under the GPLV3 license:
     [License](https://github.com/wackonline/structrecord/blob/master/LICENSE)

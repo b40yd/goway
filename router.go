@@ -34,11 +34,13 @@ type Router interface {
 	Any(string, Handler)
 	// AddRoute adds a route for a given HTTP method request to the specified matching pattern.
 	Static(string, string)
+	NotFound(handlers Handler)
 }
 
 type Routes struct {
 	routes   []*router
 	handlers []Handler
+	notFound []Handler
 }
 
 type router struct {
@@ -89,6 +91,10 @@ func (r *Routes) Static(pattern string, dir string) {
 		path = filepath.Join(dir, path)
 		http.ServeFile(w, r, path)
 	})
+}
+
+func (r *Routes) NotFound(handler Handler) {
+	r.notFound = []Handler{handler}
 }
 
 func (r *Routes) AddRouter(method string, pattern string, handler Handler) {
@@ -153,7 +159,8 @@ func (routes *Routes) Handler(w http.ResponseWriter, r *http.Request, c Context)
 			c.Map(vals)
 			break
 		} else {
-			routes.handlers = []Handler{http.NotFound} //make([]Handler, 0)
+			// not found handler,set routes.notFound
+			routes.handlers = routes.notFound //make([]Handler, 0)
 		}
 	}
 	//

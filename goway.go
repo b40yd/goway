@@ -2,7 +2,9 @@ package goway
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"reflect"
 )
 
@@ -10,6 +12,7 @@ type Goway struct {
 	Injector
 	handlers []Handler
 	action   Handler
+	Logger   *log.Logger
 }
 type ClassicGoway struct {
 	*Goway
@@ -35,7 +38,7 @@ func (g *Goway) isHander(handler Handler) error {
 	t := reflect.TypeOf(handler)
 	if t.Kind() != reflect.Func {
 		//params is wrong!
-		fmt.Errorf("params is wrong!It params must be an function!")
+		fmt.Errorf("params is wrong!It params must be an Handler type!")
 	}
 	return nil
 }
@@ -66,12 +69,16 @@ func (g *Goway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g *Goway) RunOnAddr(addr string) {
-	http.ListenAndServe(addr, g)
+	logger := g.Injector.Get(reflect.TypeOf(g.Logger)).Interface().(*log.Logger)
+	logger.Printf("listening on %s \n", addr)
+	logger.Fatalln(http.ListenAndServe(addr, g))
 }
 
 func Bootstrap() *ClassicGoway {
-	g := &Goway{Injector: NewInjector(), action: func() {}}
+	g := &Goway{Injector: NewInjector(), action: func() {}, Logger: log.New(os.Stdout, "[*Goway*] ", 0)}
 	r := NewRouter()
+	g.Map(g.Logger)
+	g.Use(Logger())
 	g.MapTo(r, (*Router)(nil))
 	g.Map(defaultReturnHandler()) //The default return by defaultReturnHandler
 	g.Action(r.Handler)

@@ -13,6 +13,8 @@ type ResponseWriter interface {
 	Write([]byte) (int, error)
 	WriteHeader(int)
 	IsWrite() bool
+	Status() int
+	Size() int
 }
 
 type responseWriter struct {

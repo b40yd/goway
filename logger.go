@@ -34,6 +34,7 @@ const (
 
 type Loggers interface {
 	SetLogLevel(string)
+        IsLogger(int) bool
 }
 type logger struct {
 	lvs     int
@@ -84,6 +85,23 @@ func InitLogger() Loggers {
 	// An operation to get all the mistakes
 	logs.lvs = E_ALL | E_ERROR | E_WARNING | E_STRICT | E_NOTICE
 	return logs
+}
+
+func (lg *logger)IsLogger(logLv int) bool {
+        switch logLv {
+        case E_ALL:
+                return lg.All
+        case E_ERROR:
+                return lg.Error
+        case E_WARNING:
+                return lg.Warning
+        case E_STRICT:
+                return lg.Strict
+        case E_NOTICE:
+                return lg.Notice
+        default:
+                return false
+        }
 }
 
 func Logger() Handler {

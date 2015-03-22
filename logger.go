@@ -22,6 +22,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+        "os"
 
 )
 
@@ -36,9 +37,10 @@ const (
 type Logger interface {
 	Setloglevel(string)
         IsLogger(int) bool
+        StartLogger() Handler
 }
-type logger struct {
-        logs log.Logger
+type Logs struct {
+        logs *log.Logger
 	lvs     int
 	All     bool
 	Error   bool
@@ -53,7 +55,7 @@ type logger struct {
 //   all & C not eq 0 (C in ALL)
 //   all1 := A|B|C
 //   all1 & D eq 0 (D not in ALL)
-func (lg logger) isLv(v int) bool {
+func (lg *Logs) isLv(v int) bool {
 	perm := lg.lvs & v
 	if perm == 0 {
 		return true
@@ -62,7 +64,7 @@ func (lg logger) isLv(v int) bool {
 }
 
 //Excluded error message is set to false
-func (lg *logger) Setloglevel(lv string) {
+func (lg *Logs) Setloglevel(lv string) {
 	str := strings.Split(lv, "|")
 	if len(str) >= 1 {
 		for _, v := range str {
@@ -83,13 +85,13 @@ func (lg *logger) Setloglevel(lv string) {
 }
 
 func InitLogger() Logger {
-	log := &logger{}
+	logs := &Logs{logs:log.New(os.Stdout,"[*Goway*] ",0)}
 	// An operation to get all the mistakes
-	log.lvs = E_ALL | E_ERROR | E_WARNING | E_STRICT | E_NOTICE
-	return log
+	logs.lvs = E_ALL | E_ERROR | E_WARNING | E_STRICT | E_NOTICE
+	return logs
 }
 
-func (lg *logger)IsLogger(logLv int) bool {
+func (lg *Logs)IsLogger(logLv int) bool {
         switch logLv {
         case E_ALL:
                 return lg.All
@@ -106,9 +108,8 @@ func (lg *logger)IsLogger(logLv int) bool {
         }
 }
 
-func StartLogger() Handler{
-        return func(res http.ResponseWriter, req *http.Request, c Context, log *log.Logger) {
-
+func (lg *Logs)StartLogger() Handler {
+        return func(res http.ResponseWriter, req *http.Request, c Context) {
                 start := time.Now()
                 addr := req.Header.Get("X-Real-IP")
                 if addr == "" {
@@ -118,12 +119,11 @@ func StartLogger() Handler{
                         }
                 }
 
-                log.Printf("Started %s %s for %s", req.Method, req.URL.Path, addr)
+                lg.logs.Printf("Started %s %s for %s", req.Method, req.URL.Path, addr)
 
                 rw := res.(ResponseWriter)
                 c.Next()
-
-                log.Printf("Completed %v %s, Content-Length: %v bytes in %v\n", rw.Status(), http.StatusText(rw.Status()), rw.Size(), time.Since(start))
+                lg.logs.Printf("Completed %v %s, Content-Length: %v bytes in %v\n", rw.Status(), http.StatusText(rw.Status()), rw.Size(), time.Since(start))
 
         }
 }

@@ -32,6 +32,8 @@ const (
 	ENV        = "development"
 	DEBUG      = true
 	LOGGER     = "E_ALL"
+        STATICPATH ="/public"
+        VERSION = "0.0.1"
 )
 
 type Config interface {
@@ -82,12 +84,12 @@ func (c *config) Getconf(path string, key string) interface{} {
 
 // setting default config infomation
 func (c *config) defaultConfig() {
-	c.configs["httpServer"] = "0.0.0.0"
-	c.configs["serverPort"] = "8080"
-	c.configs["staticPath"] = "/public"
-	c.configs["logger"] = "E_ALL"
-	c.configs["debug"] = true
-	c.configs["version"] = "0.0.1"
+	c.configs["httpServer"] = HTTPSERVER
+	c.configs["serverPort"] = PORT
+	c.configs["staticPath"] = STATICPATH
+	c.configs["logger"] = E_ALL
+	c.configs["debug"] = DEBUG
+	c.configs["version"] = VERSION
 }
 
 // parase config,setting values

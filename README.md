@@ -31,7 +31,7 @@
 ### Config
 In Goway, is configure web app config file.It mainly to inform how the app works,it's an JSON data struct.
 
-```Json
+```go
     {
       // App version
       "version":"0.0.1",
@@ -50,7 +50,7 @@ In Goway, is configure web app config file.It mainly to inform how the app works
       // HTTP Server ip address
       "httpServer":"0.0.0.0",
       // HTTP Server port
-      "serverPort":"8080",
+      "serverPort":"8080"
     }
 ```
 ### Routing

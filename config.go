@@ -40,10 +40,13 @@ type Config interface {
 	Getconf(string, string) interface{}
 	Get(string) interface{}
 	Set(string, interface{}) Config
+        Logs() []Tlogs
 }
+
 
 type config struct {
 	configs map[string]interface{}
+        logs []Tlogs
 }
 
 // By key to get the value of the configuration file
@@ -57,6 +60,10 @@ func (c *config) Set(key string, value interface{}) Config {
 	return c
 }
 
+func (c *config) Logs() []Tlogs {
+        return c.logs
+}
+
 func (c *config) isFileExist(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil || os.IsExist(err)
@@ -67,7 +74,10 @@ func (c *config) readFile(path string) ([]byte, error) {
 	if c.isFileExist(path) {
 		return ioutil.ReadFile(path)
 	}
-	return nil, fmt.Errorf("Config file is not exist.")
+        log := Tlogs{}//make(map[int]string)
+        log[E_ERROR] = "Config file is not exist."
+        c.logs = append(c.logs,log)
+	return nil, fmt.Errorf(log[E_ERROR])
 }
 
 // Access to data in a configuration file
@@ -75,7 +85,7 @@ func (c *config) Getconf(path string, key string) interface{} {
 	data, err := c.readFile(path)
 	results := make(map[string]interface{})
 	if err == nil {
-		if err := json.Unmarshal(data, results); err != nil {
+		if err := json.Unmarshal([]byte(data), &results); err == nil {
 			return results[key]
 		}
 	}
@@ -84,12 +94,14 @@ func (c *config) Getconf(path string, key string) interface{} {
 
 // setting default config infomation
 func (c *config) defaultConfig() {
-	c.configs["httpServer"] = HTTPSERVER
-	c.configs["serverPort"] = PORT
-	c.configs["staticPath"] = STATICPATH
-	c.configs["logger"] = E_ALL
-	c.configs["debug"] = DEBUG
-	c.configs["version"] = VERSION
+        configs := make(map[string]interface{})
+	configs["httpServer"] = HTTPSERVER
+	configs["serverPort"] = PORT
+	configs["staticPath"] = STATICPATH
+	configs["logger"] = LOGGER
+	configs["debug"] = DEBUG
+	configs["version"] = VERSION
+        c.configs = configs
 }
 
 // parase config,setting values
@@ -100,7 +112,12 @@ func (c *config) paraseConfig() {
 	}
 	data, err := c.readFile(path.Join(root, CONFIGFILE))
 	if err == nil {
-		err := json.Unmarshal(data, c.configs)
+                c.defaultConfig()
+		err := json.Unmarshal([]byte(data),&c.configs)
+                log := Tlogs{}//make(map[int]string)
+                log[E_ERROR] = "Json data parase fail!"
+                log[E_NOTICE] = "Reading system default config..."
+                c.logs = append(c.logs,log)
 		if err != nil {
 			c.defaultConfig()
 		}
@@ -112,8 +129,8 @@ func (c *config) paraseConfig() {
 
 // Initialize the configuration file
 // if read config file failer,used default config
-func Init() Config {
-	configs := &config{}
+func InitConfig() Config {
+	configs := &config{logs:[]Tlogs{}}
 	configs.paraseConfig()
 	return configs
 }

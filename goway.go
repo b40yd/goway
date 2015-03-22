@@ -11,6 +11,7 @@ type Goway struct {
 	Injector
 	handlers []Handler
 	action   Handler
+	Config   Config
 	Logger   Logger
 }
 type ClassicGoway struct {
@@ -69,14 +70,23 @@ func (g *Goway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (g *Goway) RunOnAddr(addr string) {
 	logger := g.Injector.Get(reflect.TypeOf(g.Logger)).Interface().(*Logs)
-	logger.logs.Printf("listening on %s \n", addr)
-	logger.logs.Fatalln(http.ListenAndServe(addr, g))
+	logger.Notice(fmt.Sprintf("listening on %s \n", addr))
+	logger.logger.Fatalln(http.ListenAndServe(addr, g))
+}
+
+func (g *Goway) Run(){
+	g.RunOnAddr(g.Config.Get("httpServer").(string)+":"+g.Config.Get("serverPort").(string))
 }
 
 func Bootstrap() *ClassicGoway {
-	g := &Goway{Injector: NewInjector(), action: func() {}, Logger: InitLogger()}
+	c := InitConfig()
+	g := &Goway{Injector: NewInjector(), action: func() {}, Config: c, Logger: InitLogger()}
 	r := NewRouter()
+	g.Logger.Setloglevel(c.Get("logger").(string))
+	g.Logger.Use(c.Logs())
+	g.Logger.Print()
 	g.Map(g.Logger)
+	g.Map(c)
 	g.Use(g.Logger.StartLogger())
 	g.MapTo(r, (*Router)(nil))
 	g.Map(defaultReturnHandler()) //The default return by defaultReturnHandler

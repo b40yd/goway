@@ -23,30 +23,61 @@ import (
 	"strings"
 	"time"
         "os"
-
+        "fmt"
 )
 
 const (
-	E_ALL     = 0
+	//E_ALL     = 1
 	E_ERROR   = 1
 	E_WARNING = 2
-	E_STRICT  = 3
-	E_NOTICE  = 4
+	E_STRICT  = 4
+	E_NOTICE  = 8
 )
 
 type Logger interface {
 	Setloglevel(string)
         IsLogger(int) bool
         StartLogger() Handler
+        Error(string)
+        Warning(string)
+        Strict(string)
+        Notice(string)
+        Use([]Tlogs)
+        Print()
 }
+type Tlogs map[int]string
 type Logs struct {
-        logs *log.Logger
+        logger *log.Logger
 	lvs     int
-	All     bool
-	Error   bool
-	Warning bool
-	Strict  bool
-	Notice  bool
+        logs []Tlogs
+}
+
+func (lg *Logs) Error(str string){
+        lg.addInfo(E_ERROR,str)
+}
+
+func (lg *Logs) Warning(str string){
+        lg.addInfo(E_WARNING,str)
+}
+
+func (lg *Logs) Strict(str string){
+        lg.addInfo(E_STRICT,str)
+}
+
+func (lg *Logs) Notice(str string){
+        lg.addInfo(E_NOTICE,str)
+}
+
+func (lg *Logs) Use(lgs []Tlogs){
+        for _,v := range lgs{
+                lg.logs = append(lg.logs, v)
+        }
+}
+
+func (lg *Logs) addInfo(ty int,str string){
+        log := make(map[int]string)
+        log[ty] = str
+        lg.logs = append(lg.logs,log)
 }
 
 // Determine whether excluded set log level
@@ -55,12 +86,12 @@ type Logs struct {
 //   all & C not eq 0 (C in ALL)
 //   all1 := A|B|C
 //   all1 & D eq 0 (D not in ALL)
-func (lg *Logs) isLv(v int) bool {
+func (lg *Logs) IsLogger(v int) bool {
 	perm := lg.lvs & v
 	if perm == 0 {
-		return true
+		return false
 	}
-	return false
+	return true
 }
 
 //Excluded error message is set to false
@@ -69,47 +100,69 @@ func (lg *Logs) Setloglevel(lv string) {
 	if len(str) >= 1 {
 		for _, v := range str {
 			if v == "E_NOTICE" {
-				lg.Notice = lg.isLv(E_NOTICE)
+				lg.lvs = lg.lvs|E_NOTICE
 			} else if v == "E_ERROR" {
-				lg.Error = lg.isLv(E_ERROR)
+				lg.lvs = lg.lvs|E_ERROR
 			} else if v == "E_WARNING" {
-				lg.Warning = lg.isLv(E_WARNING)
+				lg.lvs = lg.lvs|E_WARNING
 			} else if v == "E_STRICT" {
-				lg.Strict = lg.isLv(E_STRICT)
+				lg.lvs = lg.lvs|E_STRICT
+			} else if v == "E_ALL" {
+				lg.lvs = E_ERROR | E_WARNING | E_STRICT | E_NOTICE
 			} else {
-				lg.All = lg.isLv(E_ALL)
-			}
+                                lg.lvs = 0
+                        }
 		}
 	}
-	lg.All = false
+	//lg.all = false
 }
 
 func InitLogger() Logger {
-	logs := &Logs{logs:log.New(os.Stdout,"[*Goway*] ",0)}
-	// An operation to get all the mistakes
-	logs.lvs = E_ALL | E_ERROR | E_WARNING | E_STRICT | E_NOTICE
+	logs := &Logs{logger:log.New(os.Stdout,"[*GOWAY*] ",0)}
+        logs.lvs = 0//E_ERROR | E_WARNING | E_STRICT | E_NOTICE
 	return logs
 }
 
-func (lg *Logs)IsLogger(logLv int) bool {
-        switch logLv {
-        case E_ALL:
-                return lg.All
+
+func (lg *Logs) setLogInfo(k int,v string) {
+        switch k {
         case E_ERROR:
-                return lg.Error
+                lg.logger.SetPrefix("[*Goway*][Error] ")
+                lg.logger.Printf(v)
         case E_WARNING:
-                return lg.Warning
+                lg.logger.SetPrefix("[*Goway*][Warning] ")
+                lg.logger.Printf(v)
         case E_STRICT:
-                return lg.Strict
+                lg.logger.SetPrefix("[*Goway*][Strict] ")
+                lg.logger.Printf(v)
         case E_NOTICE:
-                return lg.Notice
-        default:
-                return false
+                lg.logger.SetPrefix("[*Goway*][Notice] ")
+                lg.logger.Printf(v)
+
         }
 }
 
+func (lg *Logs) Print(){
+        for _,log := range lg.logs {
+                for k, v := range log {
+                        if lg.IsLogger(E_ERROR) && lg.IsLogger(E_WARNING) && lg.IsLogger(E_STRICT) && lg.IsLogger(E_NOTICE) {
+                                lg.setLogInfo(k, v)
+                        }else if lg.IsLogger(E_ERROR) && k == E_ERROR {
+                                lg.setLogInfo(k, v)
+                        }else if lg.IsLogger(E_NOTICE)  && k == E_NOTICE {
+                                lg.setLogInfo(k, v)
+                        }else if lg.IsLogger(E_STRICT) && k == E_STRICT {
+                                lg.setLogInfo(k, v)
+                        }else if lg.IsLogger(E_WARNING) && k==E_WARNING {
+                                lg.setLogInfo(k, v)
+                        }
+                }
+        }
+        lg.logs = []Tlogs{}
+}
+
 func (lg *Logs)StartLogger() Handler {
-        return func(res http.ResponseWriter, req *http.Request, c Context) {
+        return func(res http.ResponseWriter, req *http.Request, c Context,lgs Logger) {
                 start := time.Now()
                 addr := req.Header.Get("X-Real-IP")
                 if addr == "" {
@@ -118,12 +171,13 @@ func (lg *Logs)StartLogger() Handler {
                                 addr = req.RemoteAddr
                         }
                 }
-
-                lg.logs.Printf("Started %s %s for %s", req.Method, req.URL.Path, addr)
+                info := fmt.Sprintf("Started %s %s for %s", req.Method, req.URL.Path, addr)
+                lgs.Notice(info)
 
                 rw := res.(ResponseWriter)
                 c.Next()
-                lg.logs.Printf("Completed %v %s, Content-Length: %v bytes in %v\n", rw.Status(), http.StatusText(rw.Status()), rw.Size(), time.Since(start))
-
+                info = fmt.Sprintf("Completed %v %s, Content-Length: %v bytes in %v\n", rw.Status(), http.StatusText(rw.Status()), rw.Size(), time.Since(start))
+                lgs.Notice(info)
+                lgs.Print()
         }
 }

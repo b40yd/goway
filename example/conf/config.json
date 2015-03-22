@@ -1,0 +1,17 @@
+{
+
+    "version":"0.0.1",
+
+    "debug":true,
+
+    "logger":"E_ERROR", 
+
+    "env":"development",
+    
+    "staticPath": "/public",
+
+    "httpServer":"0.0.0.0",
+
+    "serverPort":"8080"
+}
+

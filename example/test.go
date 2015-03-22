@@ -12,11 +12,11 @@ func main() {
 	gm := goway.Bootstrap()
 
 	gm.Get("/", func() string {
-		gm.Logger.Println("hello test...")
+		//gm.Logger.Println("hello test...")
 		return "hello,write"
 	})
 	gm.Get("/hi", func() string {
-		gm.Logger.Printf("say hi test...")
+		//gm.Logger.Printf("say hi test...")
 		return "say hi,write"
 	})
 	pwd, _ := os.Getwd()
@@ -27,11 +27,11 @@ func main() {
 	})
 
 	gm.Get("/say", func() string {
-		gm.Logger.Printf("say hello!!!")
+		// gm.Logger.Printf("say hello!!!")
 		// logger := gm.Injector.Get(reflect.TypeOf(log.Logger(nil))).Interface().(*log.Logger)
 		// logger.Printf("say image test...")
 		return "<html><head><title>test loading</title></head><body><img src='/public/loading.gif'></body></html>"
 	})
 
-	gm.RunOnAddr("0.0.0.0:8080")
+	gm.Run()
 }

@@ -33,24 +33,24 @@ In Goway, is configure web app config file.It mainly to inform how the app works
 
 ```Json
     {
-    // App version
-    "version":"0.0.1",
-    // Application debugging information
-    // false and true
-    "debug":true,
-    // Logging
-    // E_ALL|E_ERROR|E_WARNING|E_STRICT|E_NOTICE
-    "logger":"E_ALL", 
-    // App run environment
-    // development|testing|product
-    "env":"development",
-    // Setting static directory path
-    // Directory to the current app running directory to the root directory
-    "staticPath": "/public",
-    // HTTP Server ip address
-    "httpServer":"0.0.0.0",
-    // HTTP Server port
-    "serverPort":"8080",
+      // App version
+      "version":"0.0.1",
+      // Application debugging information
+      // false and true
+      "debug":true,
+      // Logging
+      // E_ALL|E_ERROR|E_WARNING|E_STRICT|E_NOTICE
+      "logger":"E_ALL",
+      // App run environment
+      // development|testing|product
+      "env":"development",
+      // Setting static directory path
+      // Directory to the current app running directory to the root directory
+      "staticPath": "/public",
+      // HTTP Server ip address
+      "httpServer":"0.0.0.0",
+      // HTTP Server port
+      "serverPort":"8080",
     }
 ```
 ### Routing

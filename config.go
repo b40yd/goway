@@ -114,16 +114,16 @@ func (c *config) paraseConfig() {
 	if err == nil {
                 c.defaultConfig()
 		err := json.Unmarshal([]byte(data),&c.configs)
-                log := Tlogs{}//make(map[int]string)
-                log[E_ERROR] = "Json data parase fail!"
-                log[E_NOTICE] = "Reading system default config..."
-                c.logs = append(c.logs,log)
-		if err != nil {
+                if err != nil {
 			c.defaultConfig()
 		}
 	} else {
 		c.defaultConfig()
 	}
+        log := Tlogs{}//make(map[int]string)
+        log[E_ERROR] = "Json data parase fail!"
+        log[E_NOTICE] = "Reading system default config..."
+        c.logs = append(c.logs,log)
 
 }
 

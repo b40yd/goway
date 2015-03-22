@@ -1,4 +1,4 @@
-/* -*- indent-tabs-mode:nil; coding: utf-8 -*-
+/* -*- Indent-tabs-mode:nil; coding: utf-8 -*-
  * Copyleft (C) 2015
  * "Tag bao" known as "wackonline" <bb.qnyd@gmail.com>
  * Goway is free software: you can redistribute it and/or modify
@@ -22,6 +22,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
 )
 
 const (
@@ -32,11 +33,12 @@ const (
 	E_NOTICE  = 4
 )
 
-type Loggers interface {
-	SetLogLevel(string)
+type Logger interface {
+	Setloglevel(string)
         IsLogger(int) bool
 }
 type logger struct {
+        logs log.Logger
 	lvs     int
 	All     bool
 	Error   bool
@@ -60,7 +62,7 @@ func (lg logger) isLv(v int) bool {
 }
 
 //Excluded error message is set to false
-func (lg *logger) SetLogLevel(lv string) {
+func (lg *logger) Setloglevel(lv string) {
 	str := strings.Split(lv, "|")
 	if len(str) >= 1 {
 		for _, v := range str {
@@ -80,11 +82,11 @@ func (lg *logger) SetLogLevel(lv string) {
 	lg.All = false
 }
 
-func InitLogger() Loggers {
-	logs := &logger{}
+func InitLogger() Logger {
+	log := &logger{}
 	// An operation to get all the mistakes
-	logs.lvs = E_ALL | E_ERROR | E_WARNING | E_STRICT | E_NOTICE
-	return logs
+	log.lvs = E_ALL | E_ERROR | E_WARNING | E_STRICT | E_NOTICE
+	return log
 }
 
 func (lg *logger)IsLogger(logLv int) bool {
@@ -104,23 +106,24 @@ func (lg *logger)IsLogger(logLv int) bool {
         }
 }
 
-func Logger() Handler {
-	return func(res http.ResponseWriter, req *http.Request, c Context, log *log.Logger) {
-		start := time.Now()
+func StartLogger() Handler{
+        return func(res http.ResponseWriter, req *http.Request, c Context, log *log.Logger) {
 
-		addr := req.Header.Get("X-Real-IP")
-		if addr == "" {
-			addr = req.Header.Get("X-Forwarded-For")
-			if addr == "" {
-				addr = req.RemoteAddr
-			}
-		}
+                start := time.Now()
+                addr := req.Header.Get("X-Real-IP")
+                if addr == "" {
+                        addr = req.Header.Get("X-Forwarded-For")
+                        if addr == "" {
+                                addr = req.RemoteAddr
+                        }
+                }
 
-		log.Printf("Started %s %s for %s", req.Method, req.URL.Path, addr)
+                log.Printf("Started %s %s for %s", req.Method, req.URL.Path, addr)
 
-		rw := res.(ResponseWriter)
-		c.Next()
+                rw := res.(ResponseWriter)
+                c.Next()
 
-		log.Printf("Completed %v %s, Content-Length: %v bytes in %v\n", rw.Status(), http.StatusText(rw.Status()), rw.Size(), time.Since(start))
-	}
+                log.Printf("Completed %v %s, Content-Length: %v bytes in %v\n", rw.Status(), http.StatusText(rw.Status()), rw.Size(), time.Since(start))
+
+        }
 }

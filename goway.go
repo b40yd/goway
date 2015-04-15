@@ -88,6 +88,7 @@ func Bootstrap() *ClassicGoway {
 	g.Map(g.Logger)
 	g.Map(c)
 	g.Use(g.Logger.StartLogger())
+	g.Use(Recovery(c))
 	g.MapTo(r, (*Router)(nil))
 	g.Map(defaultReturnHandler()) //The default return by defaultReturnHandler
 	g.Action(r.Handler)

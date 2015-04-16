@@ -102,6 +102,12 @@ In Goway, a logger is an HTTP request after call debug infomation
     gm.Logger.Notice("the is notice!")
     gm.Logger.Warning("the is warning!")
     gm.Logger.Strict("the is strict!")
+    //use params
+    sid := 110
+    gm.Logger.Error("the is error! Sessionid: %d", sid)
+    gm.Logger.Notice("the is notice! Sessionid: %d", sid)
+    gm.Logger.Warning("the is warning! Sessionid: %d", sid)
+    gm.Logger.Strict("the is strict! Sessionid: %d", sid)
 ```
 ### Other example
 *   read test file

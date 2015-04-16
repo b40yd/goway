@@ -12,7 +12,9 @@ func main() {
 	gm := goway.Bootstrap()
 
 	gm.Get("/", func() string {
-		//gm.Logger.Println("hello test...")
+		a := "args"
+		b := 2
+		gm.Logger.Notice("hello test... %v --- %d", a, b)
 		return "hello,write"
 	})
 	gm.Get("/hi", func() string {

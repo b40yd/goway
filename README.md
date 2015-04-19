@@ -23,7 +23,7 @@
             return "hello,world"
         })
 
-        gm.run()
+        gm.Run()
         //gm.RunOnAddr("0.0.0.0:8080")
     }
 

@@ -17,10 +17,17 @@ func main() {
 		gm.Logger.Notice("hello test... %v --- %d", a, b)
 		return "hello,write"
 	})
-	gm.Get("/hi", func() string {
-		//gm.Logger.Printf("say hi test...")
+	gm.Get("/hi/:id", func() string {
+		p := gm.Router.Params()
+		gm.Logger.Notice("say hi test... %v %v",p,p["id"])
 		return "say hi,write"
 	})
+	gm.Get("/hi2/:id/:page", func() string {
+		p := gm.Router.Params()
+		gm.Logger.Notice("say hi test... %v %v",p,p["id2"])
+		return "say hi,write"
+	})
+
 	pwd, _ := os.Getwd()
 	gm.Static("/public", pwd)
 

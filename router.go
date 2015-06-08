@@ -35,18 +35,19 @@ type Router interface {
 	// AddRoute adds a route for a given HTTP method request to the specified matching pattern.
 	Static(string, string)
 	NotFound(handlers Handler)
+	Params() map[string]string
 }
 
 type Routes struct {
 	routes   []*router
 	handlers []Handler
 	notFound []Handler
+	params  map[string]string
 }
 
 type router struct {
 	method  string
 	regex   *regexp.Regexp
-	params  map[string]string
 	handler Handler
 }
 
@@ -133,6 +134,7 @@ func (routes *Routes) matchFunc(r *router, matches []string, path string) (bool,
 				params[name] = matches[i]
 			}
 		}
+		fmt.Printf("%v   ",params)
 		return true, params
 	}
 	return false, nil
@@ -143,9 +145,12 @@ func (routes *Routes) Match(method string, route *router, r *http.Request) (bool
 	//match router
 	if routes.matchMethod(method, route) {
 		matches := route.regex.FindStringSubmatch(r.URL.Path)
-		ok, route.params = routes.matchFunc(route, matches, r.URL.Path)
+		ok, routes.params = routes.matchFunc(route, matches, r.URL.Path)
 	}
-	return ok, route.params
+	return ok, routes.params
+}
+func (routes *Routes) Params() map[string]string {
+	return routes.params
 }
 
 func (routes *Routes) Handler(w http.ResponseWriter, r *http.Request, c Context) {
@@ -172,5 +177,5 @@ func (routes *Routes) Handler(w http.ResponseWriter, r *http.Request, c Context)
 }
 
 func NewRouter() *Routes {
-	return &Routes{handlers: []Handler{http.NotFound}}
+	return &Routes{handlers: []Handler{http.NotFound},params: make(map[string]string)}
 }

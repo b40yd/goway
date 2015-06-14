@@ -27,8 +27,8 @@ func (this *injector) All() map[reflect.Type]reflect.Value {
 	return this.values
 }
 
-func (intject *injector) SetParent(parent Injector) {
-	intject.parent = parent
+func (this *injector) SetParent(parent Injector) {
+	this.parent = parent
 }
 
 func InterfaceOf(value interface{}) reflect.Type {
@@ -45,7 +45,7 @@ func InterfaceOf(value interface{}) reflect.Type {
 	return t
 }
 
-func (intject *injector) Invoke(f interface{}) ([]reflect.Value, error) {
+func (this *injector) Invoke(f interface{}) ([]reflect.Value, error) {
 	t := reflect.TypeOf(f)
 	// NumIn returns a function type's input parameter count.
 	// It panics if the type's Kind is not Func.
@@ -55,7 +55,7 @@ func (intject *injector) Invoke(f interface{}) ([]reflect.Value, error) {
 		// It panics if the type's Kind is not Func.
 		// It panics if i is not in the range [0, NumIn()).
 		argType := t.In(i)
-		val := intject.Get(argType)
+		val := this.Get(argType)
 		if !val.IsValid() {
 			return nil, fmt.Errorf("Value not found for type %v", argType)
 		}
@@ -66,26 +66,26 @@ func (intject *injector) Invoke(f interface{}) ([]reflect.Value, error) {
 	return reflect.ValueOf(f).Call(params), nil
 }
 
-func (intject *injector) Map(val interface{}) Injector {
-	intject.values[reflect.TypeOf(val)] = reflect.ValueOf(val)
-	return intject
+func (this *injector) Map(val interface{}) Injector {
+	this.values[reflect.TypeOf(val)] = reflect.ValueOf(val)
+	return this
 }
 
-func (intject *injector) MapTo(val interface{}, interfacePtr interface{}) Injector {
-	intject.values[InterfaceOf(interfacePtr)] = reflect.ValueOf(val)
-	return intject
+func (this *injector) MapTo(val interface{}, interfacePtr interface{}) Injector {
+	this.values[InterfaceOf(interfacePtr)] = reflect.ValueOf(val)
+	return this
 }
 
 // Maps the given reflect.Type to the given reflect.Value and returns
 // the Typemapper the mapping has been registered in.
-func (intject *injector) Set(typ reflect.Type, val reflect.Value) Injector {
-	intject.values[typ] = val
-	return intject
+func (this *injector) Set(typ reflect.Type, val reflect.Value) Injector {
+	this.values[typ] = val
+	return this
 }
 
-func (intject *injector) Get(t reflect.Type) reflect.Value {
-	// fmt.Println("injectoer get :", intject.values)
-	val := intject.values[t]
+func (this *injector) Get(t reflect.Type) reflect.Value {
+	// fmt.Println("injectoer get :", this.values)
+	val := this.values[t]
 
 	if val.IsValid() {
 		return val
@@ -94,7 +94,7 @@ func (intject *injector) Get(t reflect.Type) reflect.Value {
 	// no concrete types found, try to find implementors
 	// if t is an interface
 	if t.Kind() == reflect.Interface {
-		for k, v := range intject.values {
+		for k, v := range this.values {
 			if k.Implements(t) {
 				val = v
 				break
@@ -103,8 +103,8 @@ func (intject *injector) Get(t reflect.Type) reflect.Value {
 	}
 
 	// Still no type found, try to look it up on the parent
-	if !val.IsValid() && intject.parent != nil {
-		val = intject.parent.Get(t)
+	if !val.IsValid() && this.parent != nil {
+		val = this.parent.Get(t)
 	}
 
 	return val

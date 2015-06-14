@@ -1,7 +1,7 @@
 package main
 
 import (
-	// "fmt"
+	"fmt"
 	"github.com/wackonline/goway"
 	// "log"
 	"os"
@@ -10,21 +10,21 @@ import (
 
 func main() {
 	gm := goway.Bootstrap()
-
+	fmt.Println(gm.Logs)
 	gm.Get("/", func() string {
 		a := "args"
 		b := 2
-		gm.Logger.Notice("hello test... %v --- %d", a, b)
+		gm.Logs.Notice("hello test... %v --- %d", a, b)
 		return "hello,write"
 	})
 	gm.Get("/hi/:id", func() string {
-		p := gm.Router.Params()
-		gm.Logger.Notice("say hi test... %v %v",p,p["id"])
+		//gm.Router.Params()
+		//gm.logger.Notice("say hi test... %v %v",p,p["id"])
 		return "say hi,write"
 	})
 	gm.Get("/hi2/:id/:page", func() string {
-		p := gm.Router.Params()
-		gm.Logger.Notice("say hi test... %v %v",p,p["id2"])
+		//gm.Router.Params()
+		//gm.logger.Notice("say hi test... %v %v",p,p["id2"])
 		return "say hi,write"
 	})
 

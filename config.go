@@ -129,7 +129,7 @@ func (c *config) paraseConfig() {
 
 // Initialize the configuration file
 // if read config file failer,used default config
-func InitConfig() Config {
+func NewConfig() Config {
 	configs := &config{logs:[]Tlogs{}}
 	configs.paraseConfig()
 	return configs

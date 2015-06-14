@@ -20,6 +20,8 @@ const (
 	ANY     = "*"
 )
 
+var Params map[string]string
+
 type Router interface {
 	Get(pattern string, handler Handler)
 	// Patch adds a route for a HTTP PATCH request to the specified matching pattern.
@@ -35,7 +37,6 @@ type Router interface {
 	// AddRoute adds a route for a given HTTP method request to the specified matching pattern.
 	Static(string, string)
 	NotFound(handlers Handler)
-	Params() map[string]string
 }
 
 type Routes struct {
@@ -134,7 +135,7 @@ func (routes *Routes) matchFunc(r *router, matches []string, path string) (bool,
 				params[name] = matches[i]
 			}
 		}
-		fmt.Printf("%v   ",params)
+		//fmt.Printf("%v   ",params)
 		return true, params
 	}
 	return false, nil
@@ -145,12 +146,9 @@ func (routes *Routes) Match(method string, route *router, r *http.Request) (bool
 	//match router
 	if routes.matchMethod(method, route) {
 		matches := route.regex.FindStringSubmatch(r.URL.Path)
-		ok, routes.params = routes.matchFunc(route, matches, r.URL.Path)
+		ok, Params = routes.matchFunc(route, matches, r.URL.Path)
 	}
-	return ok, routes.params
-}
-func (routes *Routes) Params() map[string]string {
-	return routes.params
+	return ok, Params
 }
 
 func (routes *Routes) Handler(w http.ResponseWriter, r *http.Request, c Context) {

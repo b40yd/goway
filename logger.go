@@ -122,7 +122,7 @@ func (lg *Logs) Setloglevel(lv string) {
 	//lg.all = false
 }
 
-func InitLogger() Logger {
+func NewLogger() Logger {
 	logs := &Logs{logger: log.New(os.Stdout, "[*GOWAY*] ", 0)}
 	logs.lvs = 0 //E_ERROR | E_WARNING | E_STRICT | E_NOTICE
 	return logs

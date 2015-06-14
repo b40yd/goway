@@ -11,12 +11,13 @@ type Goway struct {
 	Injector
 	handlers []Handler
 	action   Handler
-	Config   Config
-	Logger   Logger
 }
+
 type ClassicGoway struct {
 	*Goway
 	Router
+	Logs Logger
+	Configs Config
 }
 
 // To accept the custom function
@@ -69,29 +70,32 @@ func (g *Goway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g *Goway) RunOnAddr(addr string) {
-	logger := g.Injector.Get(reflect.TypeOf(g.Logger)).Interface().(*Logs)
+	logger := g.Injector.Get(InterfaceOf((*Logger)(nil))).Interface().(Logger)
 	logger.Notice(fmt.Sprintf("listening on %s \n", addr))
-	logger.logger.Fatalln(http.ListenAndServe(addr, g))
+	http.ListenAndServe(addr, g)
 }
 
 func (g *Goway) Run(){
-	g.RunOnAddr(g.Config.Get("httpServer").(string)+":"+g.Config.Get("serverPort").(string))
+	c := g.Injector.Get(InterfaceOf((*Config)(nil)))
+	conf := c.Interface().(Config)
+	g.RunOnAddr(conf.Get("httpServer").(string)+":"+conf.Get("serverPort").(string))
 }
 
 func Bootstrap() *ClassicGoway {
-	c := InitConfig()
-	g := &Goway{Injector: NewInjector(), action: func() {}, Config: c, Logger: InitLogger()}
+	c := NewConfig()
+	l := NewLogger()
+	g := &Goway{Injector: NewInjector(), action: func() {}}
 	r := NewRouter()
-	g.Logger.Setloglevel(c.Get("logger").(string))
-	g.Logger.Use(c.Logs())
-	g.Logger.Print()
-	g.Map(g.Logger)
-	g.Map(c)
-	g.Use(g.Logger.StartLogger())
+	l.Setloglevel(c.Get("logger").(string))
+	l.Use(c.Logs())
+	l.Print()
+	g.Use(l.StartLogger())
 	g.Use(Recovery(c))
 	g.MapTo(r, (*Router)(nil))
+	g.MapTo(l, (*Logger)(nil))
+	g.MapTo(c, (*Config)(nil))
 	g.Map(defaultReturnHandler()) //The default return by defaultReturnHandler
 	g.Action(r.Handler)
-	return &ClassicGoway{g, r}
+	return &ClassicGoway{g, r,l,c}
 
 }

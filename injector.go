@@ -12,11 +12,19 @@ type Injector interface {
 	Get(reflect.Type) reflect.Value
 	SetParent(Injector)
 	MapTo(interface{}, interface{}) Injector
+	All() map[reflect.Type]reflect.Value
 }
 
 type injector struct {
 	values map[reflect.Type]reflect.Value
 	parent Injector
+}
+
+func (this *injector) All() map[reflect.Type]reflect.Value {
+	for k,v := range this.values {
+		fmt.Printf("key: %v  value: %v \n", k,v)
+	}
+	return this.values
 }
 
 func (intject *injector) SetParent(parent Injector) {

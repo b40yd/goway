@@ -96,25 +96,25 @@ In Goway, a logger is an HTTP request after call debug infomation
     // E_ERROR | E_WARNING | E_NOTICE | E_STRICT
     log[E_ERROR] = "the is error!"
     Logs = append(Logs,log)
-    gm.Logger.Use(Logs)
+    gm.Logs.Use(Logs)
     //OR
-    gm.Logger.Error("the is error!")
-    gm.Logger.Notice("the is notice!")
-    gm.Logger.Warning("the is warning!")
-    gm.Logger.Strict("the is strict!")
+    gm.Logs.Error("the is error!")
+    gm.Logs.Notice("the is notice!")
+    gm.Logs.Warning("the is warning!")
+    gm.Logs.Strict("the is strict!")
     //use params
     sid := 110
-    gm.Logger.Error("the is error! Sessionid: %d", sid)
-    gm.Logger.Notice("the is notice! Sessionid: %d", sid)
-    gm.Logger.Warning("the is warning! Sessionid: %d", sid)
-    gm.Logger.Strict("the is strict! Sessionid: %d", sid)
+    gm.Logs.Error("the is error! Sessionid: %d", sid)
+    gm.Logs.Notice("the is notice! Sessionid: %d", sid)
+    gm.Logs.Warning("the is warning! Sessionid: %d", sid)
+    gm.Logs.Strict("the is strict! Sessionid: %d", sid)
 ```
 ### Other example
 *   read test file
     [example/test.go](example/test.go)
 
 ### About Goway
-Inspired by *Express*(Nodejs) and *Sinatra*(Ruby) and *Martini*(Go) and *Symfony*(PHP).
+Inspired by *Martini*(Go).
 This framework is simple enough, and the use of modular programming, this is a way I like it very much.
 Subsequent functional may not continue like as *Martini*,*Goway* will learn other good characteristics of the web framework.
 

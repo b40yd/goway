@@ -1,5 +1,6 @@
 # Go Way In Go
 [![wercker status](https://app.wercker.com/status/04753d15a770eedafaa8fcfcfd1cd8e9/s/master "wercker status")](https://app.wercker.com/project/bykey/04753d15a770eedafaa8fcfcfd1cd8e9)
+[![Build Status](https://travis-ci.org/7ym0n/goway.svg?branch=master)](https://travis-ci.org/7ym0n/goway)
 ### Goway:
 
 *Martini* is a powerful package for quickly writing modular web applications/services in Golang.

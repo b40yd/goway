@@ -14,7 +14,7 @@ const (
 
 var all int
 
-func main() {
+func testMain() {
 	all = A | B | C | D
 	fmt.Printf("x0:%x\n", "E_ALL")
 	fmt.Println("ALL: ", all)

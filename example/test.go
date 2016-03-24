@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/wackonline/goway"
+	"github.com/7ym0n/goway"
 	// "log"
 	"os"
 	// "reflect"

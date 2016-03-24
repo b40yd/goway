@@ -6,7 +6,7 @@ go:
   - 1.4
   - 1.5
 
-script: go test -v 
+script: go test 
 
 notifications:
   email:

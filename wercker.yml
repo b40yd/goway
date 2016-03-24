@@ -30,7 +30,7 @@ build:
     - script:
         name: go get
         code: |
-          go get github.com/wackonline/goway
+          go get 
 
     # Build the project
     - script:

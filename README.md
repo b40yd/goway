@@ -1,5 +1,5 @@
 # Go Way In Go
-[![wercker status](https://app.wercker.com/status/04753d15a770eedafaa8fcfcfd1cd8e9/s/master "wercker status")](https://app.wercker.com/project/bykey/04753d15a770eedafaa8fcfcfd1cd8e9)
+[![wercker status](https://app.wercker.com/status/30451bc78079b45e279f8461bd4b2a9e/s "wercker status")](https://app.wercker.com/project/bykey/30451bc78079b45e279f8461bd4b2a9e)
 [![Build Status](https://travis-ci.org/7ym0n/goway.svg?branch=master)](https://travis-ci.org/7ym0n/goway)
 ### Goway:
 
